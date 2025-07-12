@@ -1,0 +1,33 @@
+name: Semantic Versioning and Release
+
+on:
+  push:
+    branches:
+      - dev  # 监听 dev 分支的推送
+      - main # 监听 main 分支的推送
+
+permissions:
+  contents: write # 允许 GitHub Actions 修改仓库内容（创建 Git Tag 和 Release）
+
+jobs:
+  release:
+    runs-on: ubuntu-latest # 在 Ubuntu 最新版操作系统上运行
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # semantic-release 需要完整的 Git 历史来分析提交信息
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # 使用 Node.js 18 LTS 版本（或你项目兼容的任何版本）
+
+      - name: Install dependencies
+        run: npm install # 根据 package.json 安装所有 devDependencies
+
+      - name: Semantic Release
+        run: npx semantic-release # 执行 semantic-release 命令行工具
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions 自动提供的密钥

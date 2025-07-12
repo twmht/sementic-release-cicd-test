@@ -1,0 +1,18 @@
+{
+  "name": "my-python-project-release-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tools for automating releases of the Python project and commit linting",
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.0",
+    "@commitlint/config-conventional": "^19.1.0",
+    "semantic-release": "^23.0.0",
+    "@semantic-release/git": "^12.0.0",
+    "@semantic-release/github": "^9.0.0",
+    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/release-notes-generator": "^12.0.0"
+  },
+  "scripts": {
+    "release": "semantic-release"
+  }
+}

@@ -1,0 +1,18 @@
+[project]
+name = "sementic-release-test"
+dynamic = ["version"]
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.setuptools]
+packages = {find = {where = ["src"]}}  # 自動發現 src 中的所有包
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.hatch.version]
+path = "src/sementic_release_test/version.py"
