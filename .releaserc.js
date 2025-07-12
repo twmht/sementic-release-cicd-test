@@ -27,7 +27,7 @@ module.exports = {
           { logger, cwd, env, stdout, stderr, ...context } // 可以获取 logger 和其他 context
         ) => {
           const { execa } = await import('execa'); // 动态导入 execa 来执行 shell 命令
-          const filePath = 'src/my_package/__version__.py';
+          const filePath = 'src/sementic_release_test/version.py';
           const newVersion = version;
 
           logger.log(`Updating ${filePath} to version ${newVersion}`);
@@ -54,7 +54,7 @@ module.exports = {
         },
         assets: [
           "CHANGELOG.md",
-          "src/my_package/__version__.py"
+          "src/sementic_release_test/version.py"
         ],
         message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
