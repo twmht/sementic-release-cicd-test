@@ -4,7 +4,7 @@
   "private": true,
   "description": "Tools for automating releases of the Python project and commit linting",
   "devDependencies": {
-    "semantic-release": "^23.0.0",
+    "semantic-release": "^24.2.7",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
