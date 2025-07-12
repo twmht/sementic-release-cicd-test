@@ -12,34 +12,52 @@ module.exports = {
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
+    // 1. 生成 changelog
     [
       "@semantic-release/changelog",
       {
         changelogFile: "CHANGELOG.md"
       }
     ],
-    // 使用 @semantic-release/exec 插件來執行命令
-    [
-      "@semantic-release/exec",
-      {
-        // 使用普通字串（單引號），並轉義 sed 命令中的內部單引號
-        // 這樣 ${nextRelease.version} 會被當作字串傳遞給插件，由插件在正確的時機進行替換
-        prepareCmd: 'sed -i \'s/__version__ = .*/__version__ = "${nextRelease.version}"/\' src/sementic_release_test/version.py',
-      }
-    ],
-    // git 插件會提交上面步驟中修改過的文件
+    // 2. 修改版本文件，並將所有變更（包括 changelog）提交到 Git
     [
       "@semantic-release/git",
       {
+        // `assets` 列表告訴插件哪些文件需要被包含在 release commit 中。
+        // 插件會自動 `git add` 這些文件。
         assets: [
           "CHANGELOG.md",
           "src/sementic_release_test/version.py"
         ],
-        // 這裡的 ${...} 語法是正確的，因為 git 插件會處理它
-        message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+
+        // `prepare` 函式在提交前執行
+        prepare: async (pluginConfig, context) => {
+          const { nextRelease, logger, cwd, env } = context;
+          const { execa } = await import('execa'); // 動態導入 execa
+
+          const filePath = 'src/sementic_release_test/version.py';
+          const newVersion = nextRelease.version;
+
+          logger.log(`Updating version in ${filePath} to ${newVersion}`);
+
+          // 使用 sed 更新版本號。
+          // 注意：我們不再手動執行 'git add'。
+          await execa(
+            'sed',
+            [
+              '-i',
+              `s/__version__ = .*/__version__ = "${newVersion}"/`,
+              filePath
+            ],
+            { cwd, env }
+          );
+
+          logger.log('Version file updated successfully.');
+        }
       }
     ],
-    // github 插件負責創建 GitHub Release
+    // 3. 在 GitHub 上創建 Release
     [
       "@semantic-release/github",
       {
