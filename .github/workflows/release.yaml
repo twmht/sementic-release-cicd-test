@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # 使用 Node.js 18 LTS 版本（或你项目兼容的任何版本）
+          node-version: '20' # 使用 Node.js 18 LTS 版本（或你项目兼容的任何版本）
 
       - name: Install dependencies
         run: npm install # 根据 package.json 安装所有 devDependencies
