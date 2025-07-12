@@ -12,43 +12,39 @@ module.exports = {
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    // 1. 生成 changelog 文件
     [
       "@semantic-release/changelog",
       {
         changelogFile: "CHANGELOG.md"
       }
     ],
-    // 2. 使用 sed 更新 Python 版本文件
-    //    這個步驟必須在 @semantic-release/git 之前，才能讓 git 插件提交變更
+    // 使用 @semantic-release/exec 插件來執行命令
     [
       "@semantic-release/exec",
       {
-        // 'prepareCmd' 會在打包和發佈前執行
-        // ${nextRelease.version} 是 semantic-release 提供的變數
-        prepareCmd: `sed -i 's/__version__ = .*/__version__ = "${nextRelease.version}"/' src/sementic_release_test/version.py`,
+        // 使用普通字串（單引號），並轉義 sed 命令中的內部單引號
+        // 這樣 ${nextRelease.version} 會被當作字串傳遞給插件，由插件在正確的時機進行替換
+        prepareCmd: 'sed -i \'s/__version__ = .*/__version__ = "${nextRelease.version}"/\' src/sementic_release_test/version.py',
       }
     ],
-    // 3. 提交變更並打上標籤
+    // git 插件會提交上面步驟中修改過的文件
     [
       "@semantic-release/git",
       {
-        // assets 告訴 git 插件哪些文件需要被加入到 release commit 中
         assets: [
           "CHANGELOG.md",
-          "src/sementic_release_test/version.py",
-          // 如果你的 pyproject.toml 也需要被提交，也加進來
-          // "pyproject.toml" 
+          "src/sementic_release_test/version.py"
         ],
+        // 這裡的 ${...} 語法是正確的，因為 git 插件會處理它
         message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    // 4. 在 GitHub 上建立 Release
+    // github 插件負責創建 GitHub Release
     [
       "@semantic-release/github",
       {
-        assets: [] // 如果你需要上傳建置好的檔案 (e.g., .whl, .tar.gz)，可以加在這裡
+        assets: []
       }
     ]
   ]
-};j
+};
