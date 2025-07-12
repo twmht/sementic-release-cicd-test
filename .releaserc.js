@@ -12,6 +12,14 @@ module.exports = {
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
+    // 确保 @semantic-release/changelog 在 @semantic-release/git 之前
+    // 这样 changelog 文件才能在 git 插件提交前生成并被 git add
+    [
+      "@semantic-release/changelog",
+      {
+        changelogFile: "CHANGELOG.md" // 指定 changelog 文件名
+      }
+    ],
     [
       "@semantic-release/github",
       {
@@ -21,18 +29,16 @@ module.exports = {
     [
       "@semantic-release/git",
       {
-        // 核心改动在这里：将 prepare 从字符串数组改为一个异步函数
         prepare: async (
-          { nextRelease: { version } }, // 解构 nextRelease 对象，获取 version 属性
-          { logger, cwd, env, stdout, stderr, ...context } // 可以获取 logger 和其他 context
+          { nextRelease: { version } },
+          { logger, cwd, env, stdout, stderr, ...context }
         ) => {
-          const { execa } = await import('execa'); // 动态导入 execa 来执行 shell 命令
-          const filePath = 'src/sementic_release_test/version.py';
+          const { execa } = await import('execa');
+          const filePath = 'src/sementic_release_test/version.py'; // 确认此路径正确
           const newVersion = version;
 
           logger.log(`Updating ${filePath} to version ${newVersion}`);
 
-          // 使用 execa 执行 sed 命令来更新版本文件
           await execa(
             'sed',
             [
@@ -43,7 +49,7 @@ module.exports = {
             { cwd, env, stdout, stderr }
           );
 
-          // 添加 CHANGELOG.md 到暂存区
+          // CHANGELOG.md 现在应该是由 @semantic-release/changelog 生成的，我们只需要添加它
           await execa(
             'git',
             ['add', 'CHANGELOG.md'],
